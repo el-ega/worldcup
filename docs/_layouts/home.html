@@ -1,0 +1,16 @@
+---
+layout: default
+---
+
+<h3>Resultados históricos de los mundiales</h3>
+
+<div id="gallery" >
+    {% assign tournaments=site.tournaments | reverse %}
+    {% for tournament in tournaments %}
+        <a href="{{ site.baseurl }}{{ tournament.url }}"><img alt="{{ tournament.title }}" src="{{ site.baseurl }}/assets/images/posters/{{ tournament.slug }}.jpg"/></a>
+    {% endfor %}
+</div>
+
+<script>
+    $("#gallery").justifiedGallery({rowHeight : 180, lastRow : 'nojustify'});
+</script>

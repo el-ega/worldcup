@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="{{ page.lang | default: site.lang | default: "en" }}">
+
+  {% include head.html %}
+
+  <body>
+
+    {% include header.html %}
+
+    {% assign tournaments=site.tournaments | reverse %}
+    {% if tournaments.size > 1 %}
+        {% assign previtem = tournaments.last %}
+        {% assign nextitem = tournaments.first %}
+    {% endif %}
+    {% for links in tournaments %}
+        {% if links.title == page.title %}
+            {% unless forloop.first %}
+                {% assign previtem = prev %}
+            {% endunless %}
+            {% unless forloop.last %}
+                {% assign next = tournaments[forloop.index] %}
+                {% assign nextitem = next %}
+            {% endunless %}
+        {% endif %}
+        {% assign prev = links %}
+    {% endfor %}
+
+    <div class="container">
+        <div class="row">
+
+            <div class="col-md-4">
+                <div class="thumbnail">
+                    <img src="{{ site.baseurl }}/assets/images/posters/{{ page.slug }}.jpg">
+                    <div class="caption">
+                        <h2 class="bg-primary">{{ page.title }}</h2>
+                        <p class="clearfix">
+                        {% if tournaments.size > 1 %}
+                            {% if previtem %}
+                                <a class="pull-left" href="{{ site.baseurl }}{{ previtem.url }}">
+                                    <span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span> {{ previtem.title }}
+                                </a>
+                            {% endif %}
+                            {% if nextitem %}
+                                <a class="pull-right" href="{{ site.baseurl }}{{ nextitem.url }}">
+                                {{ nextitem.title }} <span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
+                                </a>
+                            {% endif %}
+                        {% endif %}
+                        </p>
+                        {% assign num_matches=site.data.matches[page.slug] | size %}
+                        <dl>
+                            <dt>Campeón</dt>
+                            <dd>{{ page.winner }}</dd>
+                            <dt>Participantes</dt>
+                            <dd>{{ page.total_teams }}</dd>
+                            <dt>Partidos</dt>
+                            <dd>{{ num_matches }}</dd>
+                            <dt>Goles</dt>
+                            <dd>{{ page.total_goals }} <small>(promedio por partido: {{ page.total_goals | times: 1.0 | divided_by: num_matches | round:2 }})</small></dd>
+                        </dl>
+                        <p><a href="{{ site.baseurl }}/matches/{{ page.slug }}.csv">Bajar archivo de partidos (.CSV)</a></p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-8">
+                {% assign wc=site.data.matches[page.slug] | group_by:"round" %}
+                <table class="table table-condensed">
+                {% for round in wc %}
+                    <tr class="success"><td colspan="4"><h4>{{ round.name }}</h4></td><tr>
+                    {% assign groups=round.items | group_by:"group" | sort:"name" %}
+                    {% for g in groups %}
+                        {% if g.name != '' %}<tr class="bg-info"><td colspan="4"><strong>Grupo {{ g.name }}</strong></td></tr>{% endif %}
+                        {% for m in g.items %}
+                            <tr class="match">
+                                <td class="match-team">{{ m.home }}</td>
+                                <td class="match-score text-center">
+                                    {{ m.home_goals }} {% if m.pk_home %}<small>({{ m.pk_home }})</small>{% endif %}
+                                </td>
+                                <td class="match-score text-center">
+                                     {% if m.pk_away %}<small>({{ m.pk_away }})</small>{% endif %} {{ m.away_goals }}
+                                </td>
+                                <td class="match-team text-right">{{ m.away }}</td>
+                            </tr>
+                            {% assign month = m.date | date: "%-m" %}
+                            <tr class="text-center">
+                                <td class="match-metadata" colspan="4">
+                                    <small>
+                                    {% if m.extra_time == 'y' %}Tiempo extra{% if m.pk_home %} + (penales){% endif %}<br/>{% endif %}
+                                    {{ m.date|date:"%d" }} de {% case month %}{% when '5' %}Mayo{% when '6' %}Junio{% when '7' %}Julio{% endcase %} /
+                                    {{ m.stadium }} / Árbitro: {{ m.referee }}
+                                    </small>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    {% endfor %}
+                {% endfor %}
+                </table>
+            </div>
+
+        </div>
+    </div>
+
+    {% include footer.html %}
+
+  </body>
+
+</html>
