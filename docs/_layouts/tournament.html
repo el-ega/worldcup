@@ -86,9 +86,9 @@
                             <tr class="text-center">
                                 <td class="match-metadata" colspan="4">
                                     <small>
+                                    {% assign date_len = m.date|size %}
                                     {% if m.extra_time == 'y' %}Tiempo extra{% if m.pk_home %} + (penales){% endif %}<br/>{% endif %}
-                                    {{ m.date|date:"%d" }} de {% case month %}{% when '5' %}Mayo{% when '6' %}Junio{% when '7' %}Julio{% endcase %} /
-                                    {{ m.stadium }} / Árbitro: {{ m.referee }}
+                                    {{ m.date|date:"%d" }} de {% case month %}{% when '5' %}Mayo{% when '6' %}Junio{% when '7' %}Julio{% endcase %}{% if date_len > 10 %}, {{ m.date|date:"%H"|minus:3 }}:{{ m.date|date:"%M" }}{% endif %} / {{ m.stadium }} / Árbitro: {{ m.referee }}
                                     </small>
                                 </td>
                             </tr>
